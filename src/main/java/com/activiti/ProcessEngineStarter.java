@@ -3,50 +3,76 @@ package com.activiti;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class ProcessEngineStarter {
 
 	/**
-	 * N不同的创建实例方法
+	 * N绉嶄笉鍚岀殑鍚姩鏂瑰紡
 	 * 
-	 * 	ProcessEngineConfiguration.createProcessEngineConfigurationFromResourceDefault();
-		ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(String resource);
-		ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(String resource, String beanName);
-		ProcessEngineConfiguration.createProcessEngineConfigurationFromInputStream(InputStream inputStream);
-		ProcessEngineConfiguration.createProcessEngineConfigurationFromInputStream(InputStream inputStream, String beanName);
+	 * ProcessEngineConfiguration.createProcessEngineConfigurationFromResourceDefault();
+	 * ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(String
+	 * resource);
+	 * ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(String
+	 * resource, String beanName);
+	 * ProcessEngineConfiguration.createProcessEngineConfigurationFromInputStream(InputStream
+	 * inputStream);
+	 * ProcessEngineConfiguration.createProcessEngineConfigurationFromInputStream(InputStream
+	 * inputStream, String beanName);
 	 * 
 	 */
-	
-	
-	public static void main(String[] args) {
 
-		startUsingFile();
-	}
-	
-	static{
-		startUsingFile();
-	}
-	
-	private static ProcessEngine pe;
-	
-	public static ProcessEngine getProcessEngine(){
-		if(pe==null){
-			startUsingFile();
-		}
-		return pe;
-	}
-	
-	private static void startUsingFile(){
-		ProcessEngineConfiguration cfg =ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("my-activiti.cfg.xml");
-		ProcessEngine processEngine=cfg.buildProcessEngine();
+	public static void main(String[] args) {
+		ProcessEngine processEngine = startUsingSpringFile();
 		String pName = processEngine.getName();
 		String ver = ProcessEngine.VERSION;
 		System.out.println("ProcessEngine [" + pName + "] Version: [" + ver + "]");
-		pe=processEngine;
+		pe = processEngine;
+		// startUsingFile();
 	}
-	
+
+	static {
+
+		// startUsingFile();
+	}
+
+	private static ProcessEngine pe;
+
+	public static ProcessEngine getProcessEngine() {
+		if (pe == null) {
+//			startUsingFile();
+			startUsingSpringFile();
+		}
+		return pe;
+	}
+
+	@SuppressWarnings("resource")
+	private static ProcessEngine startUsingSpringFile() {
+		ApplicationContext ac = new ClassPathXmlApplicationContext("all.xml");
+
+		ProcessEngine processEngine = (ProcessEngine) ac.getBean("processEngine");
+		pe=processEngine;
+		return processEngine;
+
+	}
+
+	private static void startUsingFile() {
+		// conf-activiti.xml
+		// ProcessEngineConfiguration cfg
+		// =ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("my-activiti.cfg.xml");
+		ProcessEngineConfiguration cfg = ProcessEngineConfiguration
+				.createProcessEngineConfigurationFromResource("all.xml");
+
+		ProcessEngine processEngine = cfg.buildProcessEngine();
+		String pName = processEngine.getName();
+		String ver = ProcessEngine.VERSION;
+		System.out.println("ProcessEngine [" + pName + "] Version: [" + ver + "]");
+		pe = processEngine;
+	}
+
 	@SuppressWarnings("unused")
-	private static void startSimple(){
+	private static void startSimple() {
 		ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
 				.setJdbcUrl("jdbc:mysql://localhost:3306/db_activiti?useUnicode=true&characterEncoding=UTF-8")
 				.setJdbcUsername("root").setJdbcPassword("sa").setJdbcDriver("com.mysql.jdbc.Driver")
@@ -55,7 +81,7 @@ public class ProcessEngineStarter {
 		String pName = processEngine.getName();
 		String ver = ProcessEngine.VERSION;
 		System.out.println("ProcessEngine [" + pName + "] Version: [" + ver + "]");
-		pe=processEngine;
+		pe = processEngine;
 	}
 
 }
